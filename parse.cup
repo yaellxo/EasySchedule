@@ -1,0 +1,51 @@
+import java_cup.runtime.Symbol;
+import java_cup.runtime.*;
+import java.util.ArrayList;
+
+// Declaración de terminales
+terminal String ID, STRING, ADD, SHOW, DELETE, UPDATE;
+
+// Declaración de no terminales
+non terminal programa, comando;
+
+// Declaración del símbolo inicial
+start with programa;
+
+
+
+// Reglas de producción
+programa ::= comando;
+
+comando ::= error
+          {: System.err.println("❌ Comando inválido. No se ejecutó ninguna acción."); :}
+        | ADD:c ID:nombre STRING:horario STRING:profesor
+          {:
+             System.out.println("Añadiendo clase: " + nombre + ", Horario: " + horario + ", Profesor: " + profesor);
+             clases.add(new Clase(nombre, horario, profesor)); // Llama al constructor de Clase
+          :}
+        | SHOW:c
+          {:
+            System.out.println("Mostrando clases:");
+            StringBuilder sb = new StringBuilder();
+            for (Clase clase : clases) {
+                sb.append(clase).append("\n"); // Utiliza el método toString() de la clase Clase
+            }
+            System.out.println(sb.toString());
+            JOptionPane.showMessageDialog(null, sb.toString()); // Mostrar en JOptionPane
+          :}
+        | DELETE:c ID:nombre
+          {:
+            System.out.println("Eliminando clase: " + nombre);
+            clases.removeIf(clase -> clase.getNombre().equals(nombre));
+          :}
+        | UPDATE:c ID:nombre STRING:horario STRING:profesor
+          {:
+            System.out.println("Actualizando clase: " + nombre + ", Horario: " + horario + ", Profesor: " + profesor);
+            for (Clase clase : clases) {
+                if (clase.getNombre().equals(nombre)) {
+                    clase.setHorario(horario);
+                    clase.setProfesor(profesor);
+                    break; // Importante: Sale del bucle después de actualizar la clase
+                }
+            }
+          :};
